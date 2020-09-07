@@ -19,8 +19,10 @@
         v-model="collapsed"
         collapsible
         :trigger="null"
+        :width="256"
       >
         <div class="logo">Ant Desingn Pro</div>
+        <SliderMenu :theme="navTheme" />
       </a-layout-sider>
       <a-layout>
         <a-layout-header style="background: #fff; padding: 0">
@@ -38,7 +40,6 @@
 
         <a-layout-footer style="text-align: center">
           <Footer />
-          <SliderMenu />
         </a-layout-footer>
       </a-layout>
     </a-layout>

@@ -1,108 +1,101 @@
 <template>
   <div style="width: 256px">
-    <h1>我是菜单</h1>
-    <a-button
-      type="primary"
-      style="margin-bottom: 16px"
-      @click="toggleCollapsed"
-    >
-      <a-icon :type="collapsed ? 'menu-unfold' : 'menu-fold'" />
-    </a-button>
-    <!-- theme="dark"  默认主题 -->
     <a-menu
-      :default-selected-keys="['1']"
-      :default-open-keys="['2']"
+      :selectedKeys="selectedKeys"
+      :openKeys.sync="openKeys"
       mode="inline"
-      :inline-collapsed="collapsed"
+      :theme="theme"
     >
-      <template v-for="item in list">
-        <a-menu-item v-if="!item.children" :key="item.key">
-          <a-icon type="pie-chart" />
-          <span>{{ item.title }}</span>
+      <template v-for="item in menuData">
+        <a-menu-item
+          v-if="!item.children"
+          :key="item.path"
+          @click="() => $router.push({ path: item.path, query: $route.query })"
+        >
+          <!-- 很重要得Click事件 来响应路由的变化哦 subMenu改动很大的 -->
+          <a-icon v-if="item.meta.icon" :type="item.meta.icon" />
+          <span>{{ item.meta.title }}</span>
         </a-menu-item>
-        <sub-menu v-else :key="item.key" :menu-info="item" />
+        <sub-menu v-else :menu-info="item" :key="item.path" />
       </template>
     </a-menu>
   </div>
 </template>
 
 <script>
-// recommend use functional component
-// <template functional>
-//   <a-sub-menu :key="props.menuInfo.key">
-//     <span slot="title">
-//       <a-icon type="mail" /><span>{{ props.menuInfo.title }}</span>
-//     </span>
-//     <template v-for="item in props.menuInfo.children">
-//       <a-menu-item v-if="!item.children" :key="item.key">
-//         <a-icon type="pie-chart" />
-//         <span>{{ item.title }}</span>
-//       </a-menu-item>
-//       <sub-menu v-else :key="item.key" :menu-info="item" />
-//     </template>
-//   </a-sub-menu>
-// </template>
-// export default {
-//   props: ['menuInfo'],
-// };
-
-import { Menu } from "ant-design-vue";
-const SubMenu = {
-  template: `
-      <a-sub-menu :key="menuInfo.key" v-bind="$props" v-on="$listeners">
-        <span slot="title">
-          <a-icon type="mail" /><span>{{ menuInfo.title }}</span>
-        </span>
-        <template v-for="item in menuInfo.children">
-          <a-menu-item v-if="!item.children" :key="item.key">
-            <a-icon type="pie-chart" />
-            <span>{{ item.title }}</span>
-          </a-menu-item>
-          <sub-menu v-else :key="item.key" :menu-info="item" />
-        </template>
-      </a-sub-menu>
-    `,
-  name: "SubMenu",
-  // must add isSubMenu: true
-  isSubMenu: true,
-  props: {
-    ...Menu.SubMenu.props,
-    // Cannot overlap with properties within Menu.SubMenu.props
-    menuInfo: {
-      type: Object,
-      default: () => ({})
-    }
-  }
-};
+/*
+ * recommend SubMenu.vue https://github.com/vueComponent/ant-design-vue/blob/master/components/menu/demo/SubMenu.vue
+ * SubMenu1.vue https://github.com/vueComponent/ant-design-vue/blob/master/components/menu/demo/SubMenu1.vue
+ * */
+import SubMenu from "./SubMenu";
 export default {
+  props: {
+    theme: {
+      type: String,
+      default: "dark"
+    }
+  },
   components: {
     "sub-menu": SubMenu
   },
+  watch: {
+    "$route.path": function(val) {
+      //路由更改的时候要 动态控制selectedKey选中的Key和 openKeys关闭时的注意控制
+      this.selectedKeys = this.selectedKeysMap[val];
+      this.openKeys = this.collapsed ? [] : this.openKeysMap[val];
+    }
+  },
   data() {
+    this.selectedKeysMap = {};
+    this.openKeysMap = {};
+    const menuData = this.getMenuData(this.$router.options.routes);
     return {
-      collapsed: false,
-      list: []
-      //   {
-      //     key: '1',
-      //     title: 'Option 1'
-      //   },
-      //   {
-      //     key: '2',
-      //     title: 'Navigation 2',
-      //     children: [
-      //       {
-      //         key: '2.1',
-      //         title: 'Navigation 3',
-      //         children: [{ key: '2.1.1', title: 'Option 2.1.1' }]
-      //       }
-      //     ]
-      //   }
-      // ]
+      collapsed: false, //控制展开和释放Menu侧边的
+      menuData,
+      // 存放路由与Keys对应的关系 HashMap的形式取得 利用路由信息来取得我选中和展开哪部分的菜单的哦
+      selectedKeys: this.selectedKeysMap[this.$route.path],
+      openKeys: this.collapsed ? [] : this.openKeysMap[this.$route.path]
     };
   },
   methods: {
     toggleCollapsed() {
       this.collapsed = !this.collapsed;
+    },
+    getMenuData(routes = [], parentKeys = [], selectedKey) {
+      //parentKeys 所有的Key的层级关系都要存放到里面的
+      const menuData = [];
+      routes.forEach(item => {
+        if (item.name && !item.hideInMenu) {
+          this.openKeysMap[item.path] = parentKeys;
+          this.selectedKeysMap[item.path] = [selectedKey || item.path]; // 可选表达式
+          const newItem = { ...item };
+          delete newItem.children;
+          if (item.children && !item.hideChildrenInMenu) {
+            newItem.children = this.getMenuData(item.children, [
+              ...parentKeys,
+              item.path
+            ]);
+          } else {
+            // 主要作用为了生成KeyMaps
+            //selectedKey选中的Key 用在分级Form中 因为路由到Step1 但是还得选中他的父级菜单的 第二个参数啥意思啊？
+            this.getMenuData(
+              item.children,
+              selectedKey ? parentKeys : [...parentKeys, item.path],
+              selectedKey || item.path
+            );
+          }
+          menuData.push(newItem);
+        } else if (
+          !item.hideInMenu &&
+          !item.hideChildrenInMenu &&
+          item.children
+        ) {
+          menuData.push(
+            ...this.getMenuData(item.children, [...parentKeys, item.path])
+          );
+        }
+      });
+      return menuData;
     }
   }
 };

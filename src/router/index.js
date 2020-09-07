@@ -3,45 +3,37 @@ import VueRouter from "vue-router";
 //import Home from "../views/Home.vue";
 import NotFoundPage from "../views/404.vue";
 Vue.use(VueRouter);
-
 const routes = [
   {
     path: "/user",
-    name: "homepage",
+    hideInMenu: true,
     component: () =>
       import(/* webpackChunkName: "layout" */ "../layouts/UserLayout.vue"),
     children: [
       {
         path: "/user",
-        redirect: "/user/login", //从定向到登录页面的
-        component: () =>
-          import(/* webpackChunkName: "user" */ "../views/User/Login.vue")
+        redirect: "/user/login"
       },
       {
         path: "/user/login",
         name: "login",
         component: () =>
-          import(/* webpackChunkName: "user" */ "../views/User/Login.vue")
+          import(/* webpackChunkName: "user" */ "../views/User/Login")
       },
       {
-        path: "/user/reg",
+        path: "/user/register",
         name: "register",
         component: () =>
-          import(/* webpackChunkName: "user" */ "../views/User/Register.vue")
+          import(/* webpackChunkName: "user" */ "../views/User/Register")
       }
     ]
   },
   {
-    path: "/404",
-    component: () => import("../views/404")
-  },
-  // 抄袭老师的路由配置哦 dashboard   form 表单的使用 basically和step-form等等表单
-  {
     path: "/",
     component: () =>
-      import(/* webpackChunkName: "layout" */ "../layouts/BasicLayout.vue"),
+      import(/* webpackChunkName: "layout" */ "../layouts/BasicLayout"),
     children: [
-      // 仪表盘的路由
+      // dashboard
       {
         path: "/",
         redirect: "/dashboard/analysis"
@@ -49,41 +41,42 @@ const routes = [
       {
         path: "/dashboard",
         name: "dashboard",
+        meta: { icon: "dashboard", title: "仪表盘" },
         component: () =>
           import(
             /* webpackChunkName: "dashboard" */ "../views/dashboard/index.vue"
           ),
         children: [
-          // 仪表盘的路由地下的二级
           {
             path: "/dashboard/analysis",
-            name: "Analysis",
+            name: "analysis",
+            meta: { title: "分析页" },
             component: () =>
               import(
-                /* webpackChunkName: "dashboard" */ "../views/dashboard/Analysis.vue"
+                /* webpackChunkName: "dashboard" */ "../views/dashboard/Analysis"
               )
           }
         ]
       },
-      // 表单的路由设置
+      // form
       {
         path: "/form",
         name: "form",
-        component: () =>
-          import(/* webpackChunkName: "dashboard" */ "../views/form/index.vue"),
-        //component: { render: h => h("router-view") },
+        component: { render: h => h("router-view") },
+        meta: { icon: "form", title: "表单" },
         children: [
           {
             path: "/form/basic-form",
-            name: "basic-form",
+            name: "basicform",
+            meta: { title: "基础表单" },
             component: () =>
-              import(
-                /* webpackChunkName: "form" */ "../views/form/BasicForm.vue"
-              )
+              import(/* webpackChunkName: "form" */ "../views/form/BasicForm")
           },
           {
             path: "/form/step-form",
-            name: "step-form",
+            name: "stepform",
+            hideChildrenInMenu: true,
+            meta: { title: "分布表单" },
             component: () =>
               import(/* webpackChunkName: "form" */ "../views/form/StepForm"),
             children: [
@@ -96,7 +89,7 @@ const routes = [
                 name: "info",
                 component: () =>
                   import(
-                    /* webpackChunkName: "form" */ "../views/form/StepForm/Step1.vue"
+                    /* webpackChunkName: "form" */ "../views/form/StepForm/Step1"
                   )
               },
               {
@@ -104,7 +97,7 @@ const routes = [
                 name: "confirm",
                 component: () =>
                   import(
-                    /* webpackChunkName: "form" */ "../views/form/StepForm/Step2.vue"
+                    /* webpackChunkName: "form" */ "../views/form/StepForm/Step2"
                   )
               },
               {
@@ -112,31 +105,20 @@ const routes = [
                 name: "result",
                 component: () =>
                   import(
-                    /* webpackChunkName: "form" */ "../views/form/StepForm/Step3.vue"
+                    /* webpackChunkName: "form" */ "../views/form/StepForm/Step3"
                   )
               }
             ]
           }
         ]
       }
-      //
     ]
   },
-
-  // 脚手架里面的内容
   {
     path: "*",
     name: "404",
+    hideInMenu: true,
     component: NotFoundPage
-  },
-  {
-    path: "/about",
-    name: "About",
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () =>
-      import(/* webpackChunkName: "about" */ "../views/About.vue")
   }
 ];
 // 防止重复同一个地址报错的代码
@@ -159,5 +141,4 @@ router.beforeEach((to, from, next) => {
 router.afterEach(() => {
   // 做一些进度条结束的操作处理哦
 });
-
 export default router;
