@@ -11,12 +11,13 @@
   </div>
 </template> -->
 <template>
-  <div class="basic-layout">
+  <div :class="[`navTheme-${navTheme}`, `navLayout-${navLayout}`]">
     <a-layout id="components-layout-demo-side" style="min-height: 100vh">
       <a-layout-sider
+        :theme="navTheme"
+        v-if="navLayout === 'left'"
         v-model="collapsed"
         collapsible
-        theme="light"
         :trigger="null"
       >
         <div class="logo">Ant Desingn Pro</div>
@@ -57,6 +58,14 @@ export default {
     SliderMenu,
     SettingDrawer
   },
+  computed: {
+    navTheme() {
+      return this.$route.query.navTheme || "dark";
+    },
+    navLayout() {
+      return this.$route.query.navLayout || "left";
+    }
+  },
   data() {
     return {
       collapsed: false
@@ -76,6 +85,18 @@ export default {
   font-size: 20px;
   &:hover {
     background-color: #eeeeee;
+  }
+}
+
+.logo {
+  height: 64px;
+  line-height: 64px;
+  text-align: center;
+  overflow: hidden;
+}
+.navTheme-dark {
+  .logo {
+    background-color: #ffffff;
   }
 }
 </style>

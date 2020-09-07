@@ -18,14 +18,22 @@
       <div>
         <template>
           <h2>主题风格定制</h2>
-          <a-radio-group name="radioGroup" :default-value="1">
-            <a-radio :value="1">黑色主题</a-radio>
-            <a-radio :value="2">白色主题</a-radio>
+          <!-- v-model 拿到的其实还是把value给我 v-model="navTheme"-->
+          <a-radio-group
+            @change="e => handleSettingChange('navTheme', e.target.value)"
+            :value="$route.query.navTheme || 'dark'"
+          >
+            <a-radio value="dark">黑色主题</a-radio>
+            <a-radio value="light">白色主题</a-radio>
           </a-radio-group>
           <h2>导航模式选择</h2>
-          <a-radio-group name="radioGroup" :default-value="1">
-            <a-radio :value="1">左侧导航</a-radio>
-            <a-radio :value="2">顶部导航</a-radio>
+          <a-radio-group
+            name="radioGroup"
+            @change="e => handleSettingChange('navLayout', e.target.value)"
+            :value="$route.query.navLayout || 'left'"
+          >
+            <a-radio value="left">左侧导航</a-radio>
+            <a-radio value="right">顶部导航</a-radio>
           </a-radio-group>
         </template>
       </div>
@@ -37,9 +45,31 @@ export default {
   data() {
     return {
       visible: false
+      // navTheme: this.$route.query.navTheme || "dark",
+      // navLayout: "left"
     };
   },
+  watch: {
+    // navTheme: function(newVal) {
+    //   console.log(newVal);
+    // }
+  },
   methods: {
+    handleSettingChange(type, value) {
+      //修改主题或布局样式
+      // console.log(type, value)
+      // let path = this.$route.path;
+      // let query = this.$route.query
+      // query.a = "abc";
+      // let location = {
+      //     path,
+      //     query
+      // }
+      // //this.$router.push(location);
+      this.$router.push({
+        query: { ...this.$route.query, [type]: value }
+      });
+    },
     onClose() {
       this.visible = false;
     },

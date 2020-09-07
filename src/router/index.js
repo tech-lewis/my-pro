@@ -139,11 +139,25 @@ const routes = [
       import(/* webpackChunkName: "about" */ "../views/About.vue")
   }
 ];
+// 防止重复同一个地址报错的代码
+const originalPush = VueRouter.prototype.push;
+VueRouter.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => err);
+};
 // history模式没有那个hash的#
 const router = new VueRouter({
   mode: "history",
   base: process.env.BASE_URL,
   routes
+});
+// 路由守卫的代码
+router.beforeEach((to, from, next) => {
+  // 在这里做特殊的判断处理
+  next();
+});
+
+router.afterEach(() => {
+  // 做一些进度条结束的操作处理哦
 });
 
 export default router;
