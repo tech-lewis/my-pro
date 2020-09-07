@@ -11,35 +11,51 @@
   </div>
 </template> -->
 <template>
-  <a-layout id="components-layout-demo-side" style="min-height: 100vh">
-    <a-layout-sider v-model="collapsed" collapsible theme="light">
-      <div class="logo">Ant Desingn Pro</div>
-      <SliderMenu />
-    </a-layout-sider>
-    <a-layout>
-      <a-layout-header style="background: #fff; padding: 0">
-        <Header />
-      </a-layout-header>
-      <a-layout-content style="margin: 0 16px">
-        <router-view></router-view>
-      </a-layout-content>
+  <div class="basic-layout">
+    <a-layout id="components-layout-demo-side" style="min-height: 100vh">
+      <a-layout-sider
+        v-model="collapsed"
+        collapsible
+        theme="light"
+        :trigger="null"
+      >
+        <div class="logo">Ant Desingn Pro</div>
+      </a-layout-sider>
+      <a-layout>
+        <a-layout-header style="background: #fff; padding: 0">
+          <a-icon
+            :type="collapsed ? 'menu-unfold' : 'menu-fold'"
+            class="fold-icon"
+            @click="collapsed = !collapsed"
+          >
+          </a-icon>
+          <Header />
+        </a-layout-header>
+        <a-layout-content style="margin: 0 16px">
+          <router-view></router-view>
+        </a-layout-content>
 
-      <a-layout-footer style="text-align: center">
-        <Footer />
-      </a-layout-footer>
+        <a-layout-footer style="text-align: center">
+          <Footer />
+          <SliderMenu />
+        </a-layout-footer>
+      </a-layout>
     </a-layout>
-  </a-layout>
+    <SettingDrawer></SettingDrawer>
+  </div>
 </template>
 
 <script>
 import Header from "./Header";
 import Footer from "./Footer";
 import SliderMenu from "./SliderMenu";
+import SettingDrawer from "../components/SettingDrawer.vue";
 export default {
   components: {
     Header,
     Footer,
-    SliderMenu
+    SliderMenu,
+    SettingDrawer
   },
   data() {
     return {
@@ -49,9 +65,17 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scoped lang="less">
 .logo {
   color: red;
-  font-size: 30px;
+  font-size: 15px;
+}
+.fold-icon {
+  line-height: 64px;
+  padding: 0 19px;
+  font-size: 20px;
+  &:hover {
+    background-color: #eeeeee;
+  }
 }
 </style>
