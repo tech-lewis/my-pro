@@ -12,8 +12,8 @@
 </template> -->
 <template>
   <a-layout id="components-layout-demo-side" style="min-height: 100vh">
-    <a-layout-sider v-model="collapsed" collapsible>
-      <div class="logo" />
+    <a-layout-sider v-model="collapsed" collapsible theme="light">
+      <div class="logo">Ant Desingn Pro</div>
       <SliderMenu />
     </a-layout-sider>
     <a-layout>
@@ -49,4 +49,9 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.logo {
+  color: red;
+  font-size: 30px;
+}
+</style>
