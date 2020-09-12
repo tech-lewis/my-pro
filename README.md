@@ -1,7 +1,20 @@
 # my-pro
 [demo] ant design pro for vue
 
+复习 函数组件的使用 来实现权限控制哦
 
+// baidu开发的DOM Resize 监听器啥？？？
+
+Lodash 的finalist和其他常见函数的使用
+
+```js
+import debounce from "lodash/debounce";
+this.resize = debounce(this.resize, 300); //截留函数的作用啥的
+debounce
+import { addListener, removeListener } from "resize-detector"; 
+//beforeDestroy 生命周期不要忘记移除监听器和this.chart.dispose
+
+```
 
 # 解决Vue Router给当前URL添加动态query无反应的问题
 
